@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>0x3m1r</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-custom navbar-mainbg">
+  <a class="navbar-brand navbar-logo" href="#">0x3m1r</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-bars text-white"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav ml-auto">
+      <div class="hori-selector"><div class="left"></div><div class="right"></div></div>
+      <li class="nav-item active">
+        <a class="nav-link" href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/0x3m1r" target="_blank"><i class="fab fa-github"></i> Github</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.linkedin.com/in/emir-taylan-g%C3%BCnday-34182a215/" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="cvLink"><i class="far fa-file-alt"></i> CV</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="far fa-chart-bar"></i> Projects</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- CV Section -->
+<div id="cvContent" class="cv-hidden">
+  <div class="sidebar">
+    <img src="profile.jpg" alt="Emir's Photo" />
+    <h2>Emir Taylan Günday</h2>
+    <p>Pentester</p>
+    <p>Email: emirgundayy@proton.me</p>
+    <p>Phone: +90 530 128 78 55</p>
+    <p>Location: Samsun, TR</p>
+    <p>Age: 24</p>
+    <button id="downloadCvBtn">Download CV as PDF</button>
+  </div>
+  <div class="main">
+    <div class="code-block">
+      /// &lt;summary&gt;<br/>
+      /// CV of Emir Taylan Günday as a C# class.<br/>
+      /// &lt;/summary&gt;<br/><br/>
+
+      public class INFORMATION {<br/>
+      &nbsp;&nbsp;public string NAME = "Emir Taylan Günday";<br/>
+      &nbsp;&nbsp;public string TITLE = "Pentester";<br/>
+      &nbsp;&nbsp;public string EMAIL = "emirgundayy@proton.me";<br/>
+      &nbsp;&nbsp;public string LOCATION = "Samsun, TR";<br/>
+      &nbsp;&nbsp;public int AGE = 24;<br/>
+      }<br/><br/>
+
+      public enum PLATFORMS {<br/>
+      &nbsp;&nbsp;Windows,<br/>
+      &nbsp;&nbsp;Linux<br/>
+      }<br/><br/>
+
+      public enum LANGUAGES {<br/>
+      &nbsp;&nbsp;C,<br/>
+      &nbsp;&nbsp;Python,<br/>
+      &nbsp;&nbsp;Bash,<br/>
+      &nbsp;&nbsp;Go<br/>
+      }<br/><br/>
+
+      public class EXPERIENCE {<br/>
+      &nbsp;&nbsp;public void VBT() {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Role = "Intern";<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Duration = "June 2025 - Present";<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Tools = "-";<br/>
+      &nbsp;&nbsp;}<br/>
+      }<br/><br/>
+
+      public class EDUCATION {<br/>
+      &nbsp;&nbsp;public void University() {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "Bachelor of Science in Computer Engineering";<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "Karabuk University";<br/>
+      &nbsp;&nbsp;}<br/>
+      &nbsp;&nbsp;public void HighSchool() {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "High School Diploma";<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "Samsun Altınkaya Anadolu High School";<br/>
+      &nbsp;&nbsp;}<br/>
+      &nbsp;&nbsp;public void 42Kocaeli() {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "42 Kocaeli Code School";<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "42 Kocaeli";<br/>
+      &nbsp;&nbsp;}<br/>
+      }<br/><br/>
+
+      public class SKILLS {<br/>
+      &nbsp;&nbsp;public string[] TechnicalSkills = {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Penetration Testing",<br/>
+      &nbsp;&nbsp;};<br/>
+      &nbsp;&nbsp;public string[] SoftSkills = {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Problem Solving",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Analytical Thinking",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Team Collaboration",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Effective Communication"<br/>
+      &nbsp;&nbsp;};<br/>
+      &nbsp;&nbsp;public string[] Tools = {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Burp Suite",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Nmap",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Metasploit",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Wireshark",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Kali Linux"<br/>
+      &nbsp;&nbsp;};<br/>
+      }<br/><br/>
+
+      public class HOBBIES {<br/>
+      &nbsp;&nbsp;public string[] Interests = {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Music",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Programming",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Reading",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Gaming"<br/>
+      &nbsp;&nbsp;};<br/>
+      }<br/><br/>
+
+      public class LANGUAGES_SPOKEN {<br/>
+      &nbsp;&nbsp;public string[] Languages = {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Turkish",<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"English"<br/>
+      &nbsp;&nbsp;};<br/>
+      }<br/><br/>
+
+      public class CERTIFICATIONS {<br/>
+      &nbsp;&nbsp;public string[] Certifications = {<br/>
+      &nbsp;&nbsp;}<br/>
+      }<br/><br/>
+
+      public class REFERENCES {<br/>
+      &nbsp;&nbsp;public string[] References = {<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;"Available upon request"<br/>
+      &nbsp;&nbsp;};<br/>
+      }<br/><br/>
+
+      public class Projects {<br/>
+      &nbsp;&nbsp;public string[] ProjectList = {<br/>
+      &nbsp;&nbsp;};<br/>
+      }<br/><br/>
+
+      public enum SOCIAL {<br/>
+      &nbsp;&nbsp;GitHub,<br/>
+      &nbsp;&nbsp;LinkedIn<br/>
+      }<br/>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  // CV görünürlüğünü toggle et
+  document.getElementById('cvLink').addEventListener('click', function (e) {
+    e.preventDefault();
+    const cv = document.getElementById('cvContent');
+    cv.classList.toggle('visible');
+    cv.classList.toggle('cv-hidden');
+  });
+
+  // PDF indir
+  document.getElementById('downloadCvBtn').addEventListener('click', function () {
+    const cvContent = document.getElementById('cvContent');
+    const downloadBtn = document.getElementById('downloadCvBtn');
+    downloadBtn.style.display = 'none';
+
+    const options = {
+      margin: [0.5, 0.5, 0.5, 0.5],
+      filename: 'Emir_Taylan_Gunday_CV.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+      pagebreak: {
+        mode: ['avoid-all', 'css', 'legacy'],
+        before: ['#page-break-before'],
+        after: ['#page-break-after'],
+        avoid: ['.no-break']
+      }
+    };
+
+    html2pdf().set(options).from(cvContent).save().then(() => {
+      downloadBtn.style.display = '';
+    });
+  });
+</script>
+
+<script src="./script.js"></script>
+</body>
+</html>
