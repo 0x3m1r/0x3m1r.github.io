@@ -1,33 +1,32 @@
-<!DOCTYPE html>
+<!Doctype html>
 <html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS Oyunlaştırma Demou</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Puan Kazan & Seviye Atla!</h1>
-        <div id="player-info" class="card">
-            <p>Puan: <span id="points">0</span></p>
-            <p>Seviye: <span id="level">1</span></p>
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="level-progress-bar"></div>
-                <span id="level-progress-text" class="progress-text"></span>
-            </div>
+<div class="navbar bg-base-100 shadow-sm">
+  <div class="flex-1">
+    <a class="btn btn-ghost text-xl">daisyUI</a>
+  </div>
+  <div class="flex gap-2">
+    <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+        <div class="w-10 rounded-full">
+          <img
+            alt="Tailwind CSS Navbar component"
+            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
         </div>
-
-        <button id="earn-points-btn">Puan Kazan! (+10)</button>
-
-        <div id="messages" class="messages-container"></div>
-
-        <h2>Kazandığınız Rozetler</h2>
-        <div id="badges-container" class="badges-container">
-            <p id="no-badges-msg">Henüz hiç rozetiniz yok. Puan kazanmaya başlayarak rozetler toplayın!</p>
-        </div>
+      </div>
+      <ul
+        tabindex="0"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        <li>
+          <a class="justify-between">
+            Profile
+            <span class="badge">New</span>
+          </a>
+        </li>
+        <li><a>Settings</a></li>
+        <li><a>Logout</a></li>
+      </ul>
     </div>
-
-    <script src="script.js"></script>
-</body>
+  </div>
+</div>   
 </html>
