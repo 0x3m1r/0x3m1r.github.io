@@ -2,6 +2,7 @@
 
 body{
 	font-family: 'Roboto', sans-serif;
+	background-color: #cfc9c9;
 }
 * {
 	margin: 0;
@@ -16,7 +17,7 @@ i {
 	color: #fff;
 }
 .navbar-mainbg{
-	background-color: #5161ce;
+	background-color: #140264;
 	padding: 0px;
 }
 #navbarSupportedContent{
@@ -45,7 +46,7 @@ i {
     position: relative;
 }
 #navbarSupportedContent>ul>li.active>a{
-	color: #5161ce;
+	color: #196139;
 	background-color: transparent;
 	transition: all 0.7s;
 }
@@ -99,7 +100,7 @@ i {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #5161ce;
+    background-color: #140264;
 }
 .hori-selector .right:before{
 	bottom: 0;
@@ -174,16 +175,66 @@ i {
 .visible {
   display: block !important;
 }
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  position: static;
+  top: 0;
+  left: 0;
+  width: auto; /* sabit genişlik */
+  height: 100%;
+  background-color: #140264;
+  color: #fff;
+  padding: 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}.sidebar img {
+  width: 100%;
+  max-width: 200px;  /* en fazla 200px genişlik */
+  max-height: 200px; /* en fazla 200px yükseklik */
+  object-fit: cover; /* taşarsa kırp, oranı bozulmasın */
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
 
 .code-block {
   background-color: #1e1e1e;
-  color: #dcdcdc;
+  color: #01570f;
   font-family: 'Fira Code', monospace;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 20px 0;
-  white-space: pre-wrap;
-  word-break: break-word;
+  padding: 15px;
+  border-radius: 40px;
+  margin: 10px;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: auto;
+  width: fit-content;
+  height: fit-content;
+  /* Satır kırılması */
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  /* Otomatik iki sütuna böl */
+  column-count: 3;
+  column-gap: 50px;
+  overflow-x: auto;
+}.code-block::before {
+  content: "// Visual Studio Code Format";
+  display: block;
+  color: #57a64a;
+  margin-bottom: 10px;
+}
+.DS-hidden {
+  display: none !important;
+}
+.visible {
+  display: block !important;
+}
+.Pt-hidden {
+  display: none !important;
+}
+.visible {
+  display: block !important;
 }

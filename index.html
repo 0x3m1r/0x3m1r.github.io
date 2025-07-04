@@ -22,7 +22,7 @@
     <ul class="navbar-nav ml-auto">
       <div class="hori-selector"><div class="left"></div><div class="right"></div></div>
       <li class="nav-item active">
-        <a class="nav-link" href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a class="nav-link" href="#" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="https://github.com/0x3m1r" target="_blank"><i class="fab fa-github"></i> Github</a>
@@ -34,129 +34,144 @@
         <a class="nav-link" href="#" id="cvLink"><i class="far fa-file-alt"></i> CV</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#"><i class="far fa-chart-bar"></i> Projects</a>
+        <a class="nav-link" href="#" id="ProjectsLink"><i class="far fa-chart-bar"></i> Projects</a>
       </li>
     </ul>
   </div>
 </nav>
-
+<div id="Projects" class="Pt-hidden">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center mt-5">Welcome to 0x3m1r's Projects</h1>
+      <p class="text-center">UnderConstruction</p>
+    </div>
+  </div>
+</div>
+<div id="Dashboard" class="DS-hidden">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center mt-5">Welcome to 0x3m1r's Dashboard</h1>
+      <p class="text-center">This is a simple dashboard template with a CV section.</p>
+    </div>
+  </div>
+</div>
 <!-- CV Section -->
 <div id="cvContent" class="cv-hidden">
-  <div class="sidebar">
-    <img src="profile.jpg" alt="Emir's Photo" />
-    <h2>Emir Taylan Günday</h2>
-    <p>Pentester</p>
-    <p>Email: emirgundayy@proton.me</p>
-    <p>Phone: +90 530 128 78 55</p>
-    <p>Location: Samsun, TR</p>
-    <p>Age: 24</p>
-    <button id="downloadCvBtn">Download CV as PDF</button>
-  </div>
-  <div class="main">
-    <div class="code-block">
-      /// &lt;summary&gt;<br/>
-      /// CV of Emir Taylan Günday as a C# class.<br/>
-      /// &lt;/summary&gt;<br/><br/>
-
-      public class INFORMATION {<br/>
-      &nbsp;&nbsp;public string NAME = "Emir Taylan Günday";<br/>
-      &nbsp;&nbsp;public string TITLE = "Pentester";<br/>
-      &nbsp;&nbsp;public string EMAIL = "emirgundayy@proton.me";<br/>
-      &nbsp;&nbsp;public string LOCATION = "Samsun, TR";<br/>
-      &nbsp;&nbsp;public int AGE = 24;<br/>
-      }<br/><br/>
-
-      public enum PLATFORMS {<br/>
-      &nbsp;&nbsp;Windows,<br/>
-      &nbsp;&nbsp;Linux<br/>
-      }<br/><br/>
-
-      public enum LANGUAGES {<br/>
-      &nbsp;&nbsp;C,<br/>
-      &nbsp;&nbsp;Python,<br/>
-      &nbsp;&nbsp;Bash,<br/>
-      &nbsp;&nbsp;Go<br/>
-      }<br/><br/>
-
-      public class EXPERIENCE {<br/>
-      &nbsp;&nbsp;public void VBT() {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Role = "Intern";<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Duration = "June 2025 - Present";<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Tools = "-";<br/>
-      &nbsp;&nbsp;}<br/>
-      }<br/><br/>
-
-      public class EDUCATION {<br/>
-      &nbsp;&nbsp;public void University() {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "Bachelor of Science in Computer Engineering";<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "Karabuk University";<br/>
-      &nbsp;&nbsp;}<br/>
-      &nbsp;&nbsp;public void HighSchool() {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "High School Diploma";<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "Samsun Altınkaya Anadolu High School";<br/>
-      &nbsp;&nbsp;}<br/>
-      &nbsp;&nbsp;public void 42Kocaeli() {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "42 Kocaeli Code School";<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "42 Kocaeli";<br/>
-      &nbsp;&nbsp;}<br/>
-      }<br/><br/>
-
-      public class SKILLS {<br/>
-      &nbsp;&nbsp;public string[] TechnicalSkills = {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Penetration Testing",<br/>
-      &nbsp;&nbsp;};<br/>
-      &nbsp;&nbsp;public string[] SoftSkills = {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Problem Solving",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Analytical Thinking",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Team Collaboration",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Effective Communication"<br/>
-      &nbsp;&nbsp;};<br/>
-      &nbsp;&nbsp;public string[] Tools = {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Burp Suite",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Nmap",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Metasploit",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Wireshark",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Kali Linux"<br/>
-      &nbsp;&nbsp;};<br/>
-      }<br/><br/>
-
-      public class HOBBIES {<br/>
-      &nbsp;&nbsp;public string[] Interests = {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Music",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Programming",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Reading",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Gaming"<br/>
-      &nbsp;&nbsp;};<br/>
-      }<br/><br/>
-
-      public class LANGUAGES_SPOKEN {<br/>
-      &nbsp;&nbsp;public string[] Languages = {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Turkish",<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"English"<br/>
-      &nbsp;&nbsp;};<br/>
-      }<br/><br/>
-
-      public class CERTIFICATIONS {<br/>
-      &nbsp;&nbsp;public string[] Certifications = {<br/>
-      &nbsp;&nbsp;}<br/>
-      }<br/><br/>
-
-      public class REFERENCES {<br/>
-      &nbsp;&nbsp;public string[] References = {<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;"Available upon request"<br/>
-      &nbsp;&nbsp;};<br/>
-      }<br/><br/>
-
-      public class Projects {<br/>
-      &nbsp;&nbsp;public string[] ProjectList = {<br/>
-      &nbsp;&nbsp;};<br/>
-      }<br/><br/>
-
-      public enum SOCIAL {<br/>
-      &nbsp;&nbsp;GitHub,<br/>
-      &nbsp;&nbsp;LinkedIn<br/>
-      }<br/>
+  <div class="layout">
+    <div class="sidebar">
+      <img src="profile.jpg" alt="Emir's Photo" />
+      <h2>Emir Taylan Günday</h2>
+      <p>Pentester</p>
+      <p>Email: emirgundayy@proton.me</p>
+      <p>Phone: +90 530 128 78 55</p>
+      <p>Location: Samsun, TR</p>
+      <p>Age: 24</p>
+      <!--<button id="downloadCvBtn">Download CV as PDF</button>   Under Construction-->
     </div>
+      <div class="code-block">
+        /// &lt;summary&gt;<br/>
+        /// CV of Emir Taylan Günday as a C# class.<br/>
+        /// &lt;/summary&gt;<br/><br/>
+
+        public class INFORMATION {<br/>
+        &nbsp;&nbsp;public string NAME = "Emir Taylan Günday";<br/>
+        &nbsp;&nbsp;public string TITLE = "Pentester";<br/>
+        &nbsp;&nbsp;public string EMAIL = "emirgundayy@proton.me";<br/>
+        &nbsp;&nbsp;public string LOCATION = "Samsun, TR";<br/>
+        &nbsp;&nbsp;public int AGE = 24;<br/>
+        }<br/><br/>
+
+        public enum PLATFORMS {<br/>
+        &nbsp;&nbsp;Windows,<br/>
+        &nbsp;&nbsp;Linux<br/>
+        }<br/><br/>
+
+        public enum LANGUAGES {<br/>
+        &nbsp;&nbsp;C,<br/>
+        &nbsp;&nbsp;Python,<br/>
+        &nbsp;&nbsp;Bash,<br/>
+        &nbsp;&nbsp;Go<br/>
+        }<br/><br/>
+
+        public class EXPERIENCE {<br/>
+        &nbsp;&nbsp;public void VBT() {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Role = "Intern";<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Duration = "June 2025 - Present";<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Tools = "-";<br/>
+        &nbsp;&nbsp;}<br/>
+        }<br/><br/>
+
+        public class EDUCATION {<br/>
+        &nbsp;&nbsp;public void University() {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "Bachelor of Science in Computer Engineering";<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "Karabuk University";<br/>
+        &nbsp;&nbsp;}<br/>
+        &nbsp;&nbsp;public void HighSchool() {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "High School Diploma";<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "Samsun Altınkaya Anadolu High School";<br/>
+        &nbsp;&nbsp;}<br/>
+        &nbsp;&nbsp;public void 42Kocaeli() {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Degree = "42 Kocaeli Code School";<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;var Institution = "42 Kocaeli";<br/>
+        &nbsp;&nbsp;}<br/>
+        }<br/><br/>
+
+        public class SKILLS {<br/>
+        &nbsp;&nbsp;public string[] TechnicalSkills = {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Penetration Testing",<br/>
+        &nbsp;&nbsp;};<br/>
+        &nbsp;&nbsp;public string[] SoftSkills = {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Problem Solving",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Analytical Thinking",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Team Collaboration",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Effective Communication"<br/>
+        &nbsp;&nbsp;};<br/>
+        &nbsp;&nbsp;public string[] Tools = {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Burp Suite",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Nmap",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Metasploit",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Wireshark",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Kali Linux"<br/>
+        &nbsp;&nbsp;};<br/>
+        }<br/><br/>
+
+        public class HOBBIES {<br/>
+        &nbsp;&nbsp;public string[] Interests = {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Music",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Programming",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Reading",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Gaming"<br/>
+        &nbsp;&nbsp;};<br/>
+        }<br/><br/>
+
+        public class LANGUAGES_SPOKEN {<br/>
+        &nbsp;&nbsp;public string[] Languages = {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Turkish",<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"English"<br/>
+        &nbsp;&nbsp;};<br/>
+        }<br/><br/>
+
+        public class CERTIFICATIONS {<br/>
+        &nbsp;&nbsp;public string[] Certifications = {<br/>
+        &nbsp;&nbsp;}<br/>
+        }<br/><br/>
+
+        public class REFERENCES {<br/>
+        &nbsp;&nbsp;public string[] References = {<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;"Available upon request"<br/>
+        &nbsp;&nbsp;};<br/>
+        }<br/><br/>
+
+        public class Projects {<br/>
+        &nbsp;&nbsp;public string[] ProjectList = {<br/>
+        &nbsp;&nbsp;};<br/>
+        }<br/><br/>
+
+        public enum SOCIAL {<br/>
+        &nbsp;&nbsp;GitHub,<br/>
+        &nbsp;&nbsp;LinkedIn<br/>
+        }<br/>
+      </div>
   </div>
 </div>
 
@@ -167,12 +182,54 @@
 
 <script>
   // CV görünürlüğünü toggle et
-  document.getElementById('cvLink').addEventListener('click', function (e) {
-    e.preventDefault();
-    const cv = document.getElementById('cvContent');
-    cv.classList.toggle('visible');
-    cv.classList.toggle('cv-hidden');
-  });
+document.getElementById('dashboardLink').addEventListener('click', function (e) {
+  e.preventDefault();
+  const dashboard = document.getElementById('Dashboard');
+  const cv = document.getElementById('cvContent');
+
+  dashboard.classList.toggle('visible');
+  dashboard.classList.toggle('DS-hidden');
+
+  // Diğer bölümü kapat
+  cv.classList.add('cv-hidden');
+  cv.classList.remove('visible');
+  // Projects bölümünü kapat
+  const projects = document.getElementById('Projects');
+  projects.classList.add('Pt-hidden');
+  projects.classList.remove('visible');
+});
+// Projects görünürlüğünü toggle et
+document.getElementById('ProjectsLink').addEventListener('click', function (e) {
+  e.preventDefault();
+  const projects = document.getElementById('Projects');
+  const dashboard = document.getElementById('Dashboard');
+  const cv = document.getElementById('cvContent');
+  projects.classList.toggle('visible');
+  projects.classList.toggle('Pt-hidden');
+  // Diğer bölümleri kapat
+  dashboard.classList.add('DS-hidden');
+  dashboard.classList.remove('visible');
+  cv.classList.add('cv-hidden');
+  cv.classList.remove('visible');
+});
+
+// CV toggle
+document.getElementById('cvLink').addEventListener('click', function (e) {
+  e.preventDefault();
+  const cv = document.getElementById('cvContent');
+  const dashboard = document.getElementById('Dashboard');
+
+  cv.classList.toggle('visible');
+  cv.classList.toggle('cv-hidden');
+
+  // Diğer bölümü kapat
+  dashboard.classList.add('DS-hidden');
+  dashboard.classList.remove('visible');
+  // Projects bölümünü kapat
+  const projects = document.getElementById('Projects');
+  projects.classList.add('Pt-hidden');
+  projects.classList.remove('visible');
+});
 
   // PDF indir
   document.getElementById('downloadCvBtn').addEventListener('click', function () {
