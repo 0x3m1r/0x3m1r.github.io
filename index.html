@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
   <link rel="stylesheet" href="./style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
 </head>
@@ -36,6 +39,9 @@
       <li class="nav-item">
         <a class="nav-link" href="#" id="ProjectsLink"><i class="far fa-chart-bar"></i> Projects</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="ustaAramaLink"><i class="fas fa-map-marker-alt"></i> Usta Arama</a>
+      </li>
     </ul>
   </div>
 </nav>
@@ -56,6 +62,85 @@
         <button class="btn btn-outline-danger" data-toggle="modal" data-target="#captivePortalModal">
           🔐 Captive Portal Projesini Gör
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Usta Arama Section -->
+<div id="UstaArama" class="UA-hidden">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="text-center mt-4 mb-4">🔧 Usta Arama ve Harita</h1>
+        <p class="text-center text-muted">Konumunuza yakın ustaları bulun ve harita üzerinde görüntüleyin</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Search Controls -->
+      <div class="col-md-4">
+        <div class="search-panel p-3">
+          <h5><i class="fas fa-search"></i> Arama Filtreleri</h5>
+          
+          <!-- Location Input -->
+          <div class="form-group">
+            <label for="locationInput">📍 Konum</label>
+            <input type="text" class="form-control" id="locationInput" placeholder="Şehir veya adres girin..." value="Samsun, TR">
+          </div>
+          
+          <!-- Craft Type Filter -->
+          <div class="form-group">
+            <label for="craftSelect">🔧 Usta Türü</label>
+            <select class="form-control" id="craftSelect">
+              <option value="">Tümü</option>
+              <option value="elektrikci">Elektrikçi</option>
+              <option value="tesisatci">Tesisatçı</option>
+              <option value="boyaci">Boyacı</option>
+              <option value="marangoz">Marangoz</option>
+              <option value="tamirci">Tamirci</option>
+            </select>
+          </div>
+          
+          <!-- Distance Filter -->
+          <div class="form-group">
+            <label for="distanceRange">📏 Maksimum Mesafe: <span id="distanceValue">10</span> km</label>
+            <input type="range" class="form-control-range" id="distanceRange" min="1" max="50" value="10">
+          </div>
+          
+          <!-- Rating Filter -->
+          <div class="form-group">
+            <label for="ratingFilter">⭐ Minimum Puan</label>
+            <select class="form-control" id="ratingFilter">
+              <option value="0">Tümü</option>
+              <option value="3">3+ Yıldız</option>
+              <option value="4">4+ Yıldız</option>
+              <option value="4.5">4.5+ Yıldız</option>
+            </select>
+          </div>
+          
+          <button class="btn btn-primary btn-block" id="searchBtn">
+            <i class="fas fa-search"></i> Ara
+          </button>
+          
+          <button class="btn btn-secondary btn-block mt-2" id="getCurrentLocationBtn">
+            <i class="fas fa-crosshairs"></i> Mevcut Konumumu Kullan
+          </button>
+        </div>
+        
+        <!-- Results List -->
+        <div class="results-panel mt-3 p-3">
+          <h5><i class="fas fa-list"></i> Sonuçlar (<span id="resultCount">0</span>)</h5>
+          <div id="resultsList">
+            <!-- Search results will be populated here -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Map -->
+      <div class="col-md-8">
+        <div class="map-container">
+          <div id="map" style="height: 600px; border-radius: 10px;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -273,6 +358,8 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
 <script>
   // CV görünürlüğünü toggle et
@@ -291,6 +378,10 @@ document.getElementById('dashboardLink').addEventListener('click', function (e) 
   const projects = document.getElementById('Projects');
   projects.classList.add('Pt-hidden');
   projects.classList.remove('visible');
+  // UstaArama bölümünü kapat
+  const ustaArama = document.getElementById('UstaArama');
+  ustaArama.classList.add('UA-hidden');
+  ustaArama.classList.remove('visible');
 });
 // Projects görünürlüğünü toggle et
 document.getElementById('ProjectsLink').addEventListener('click', function (e) {
@@ -305,6 +396,10 @@ document.getElementById('ProjectsLink').addEventListener('click', function (e) {
   dashboard.classList.remove('visible');
   cv.classList.add('cv-hidden');
   cv.classList.remove('visible');
+  // UstaArama bölümünü kapat
+  const ustaArama = document.getElementById('UstaArama');
+  ustaArama.classList.add('UA-hidden');
+  ustaArama.classList.remove('visible');
 });
 
 // CV toggle
@@ -323,6 +418,34 @@ document.getElementById('cvLink').addEventListener('click', function (e) {
   const projects = document.getElementById('Projects');
   projects.classList.add('Pt-hidden');
   projects.classList.remove('visible');
+  // UstaArama bölümünü kapat
+  const ustaArama = document.getElementById('UstaArama');
+  ustaArama.classList.add('UA-hidden');
+  ustaArama.classList.remove('visible');
+});
+// Usta Arama görünürlüğünü toggle et
+document.getElementById('ustaAramaLink').addEventListener('click', function (e) {
+  e.preventDefault();
+  const ustaArama = document.getElementById('UstaArama');
+  const dashboard = document.getElementById('Dashboard');
+  const cv = document.getElementById('cvContent');
+  const projects = document.getElementById('Projects');
+  
+  ustaArama.classList.toggle('visible');
+  ustaArama.classList.toggle('UA-hidden');
+  
+  // Diğer bölümleri kapat
+  dashboard.classList.add('DS-hidden');
+  dashboard.classList.remove('visible');
+  cv.classList.add('cv-hidden');
+  cv.classList.remove('visible');
+  projects.classList.add('Pt-hidden');
+  projects.classList.remove('visible');
+  
+  // Haritayı başlat (eğer daha önce başlatılmamışsa)
+  if (ustaArama.classList.contains('visible')) {
+    setTimeout(initializeMap, 100);
+  }
 });
 
   // PDF indir
@@ -385,6 +508,435 @@ document.getElementById('cvLink').addEventListener('click', function (e) {
       element.style.display = '';
     });
   });
+</script>
+
+<!-- Usta Arama Map and Search Functionality -->
+<script>
+let map;
+let markersCluster;
+let userLocation = null;
+
+// Sample craftsman data with coordinates
+const craftsmenData = [
+  {
+    id: 1,
+    name: "Ahmet Yılmaz",
+    type: "elektrikci",
+    lat: 41.2867,
+    lng: 36.3300,
+    address: "Atakent Mah., Samsun",
+    phone: "+90 555 123 4567",
+    rating: 4.8,
+    reviews: 45,
+    experience: "8 yıl"
+  },
+  {
+    id: 2,
+    name: "Mehmet Kaya",
+    type: "tesisatci",
+    lat: 41.2950,
+    lng: 36.3420,
+    address: "İlkadım, Samsun",
+    phone: "+90 555 234 5678",
+    rating: 4.5,
+    reviews: 32,
+    experience: "12 yıl"
+  },
+  {
+    id: 3,
+    name: "Fatma Demir",
+    type: "boyaci",
+    lat: 41.2800,
+    lng: 36.3200,
+    address: "Canik, Samsun",
+    phone: "+90 555 345 6789",
+    rating: 4.9,
+    reviews: 67,
+    experience: "6 yıl"
+  },
+  {
+    id: 4,
+    name: "Ali Öztürk",
+    type: "marangoz",
+    lat: 41.3000,
+    lng: 36.3500,
+    address: "Tekkeköy, Samsun",
+    phone: "+90 555 456 7890",
+    rating: 4.6,
+    reviews: 28,
+    experience: "15 yıl"
+  },
+  {
+    id: 5,
+    name: "Ayşe Çelik",
+    type: "elektrikci",
+    lat: 41.2700,
+    lng: 36.3100,
+    address: "Bafra, Samsun",
+    phone: "+90 555 567 8901",
+    rating: 4.3,
+    reviews: 21,
+    experience: "5 yıl"
+  },
+  {
+    id: 6,
+    name: "Hasan Koç",
+    type: "tamirci",
+    lat: 41.2950,
+    lng: 36.3300,
+    address: "Merkez, Samsun",
+    phone: "+90 555 678 9012",
+    rating: 4.7,
+    reviews: 39,
+    experience: "10 yıl"
+  }
+];
+
+// Initialize map
+function initializeMap() {
+  if (map) return; // Map already initialized
+  
+  try {
+    // Check if Leaflet is available
+    if (typeof L !== 'undefined') {
+      // Initialize map centered on Samsun, Turkey
+      map = L.map('map').setView([41.2867, 36.3300], 11);
+      
+      // Add tile layer (OpenStreetMap)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      
+      // Initialize marker cluster group
+      markersCluster = L.markerClusterGroup();
+      
+      // Add markers for all craftsmen
+      addCraftsmenMarkers();
+    } else {
+      // Fallback: Show message that map is not available
+      document.getElementById('map').innerHTML = `
+        <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 10px;">
+          <div style="text-align: center; color: #6c757d;">
+            <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h5>Harita Yüklenemedi</h5>
+            <p>Harici kaynaklar engellendiği için harita gösterilemiyor.<br>
+            Arama sonuçları listede görüntülenmektedir.</p>
+          </div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Map initialization error:', error);
+    // Show fallback message
+    document.getElementById('map').innerHTML = `
+      <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 10px;">
+        <div style="text-align: center; color: #6c757d;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+          <h5>Harita Hatası</h5>
+          <p>Harita yüklenirken bir hata oluştu.<br>
+          Arama sonuçları listede görüntülenmektedir.</p>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Setup search functionality regardless of map availability
+  setupSearchControls();
+  
+  // Try to get user location
+  getUserLocation();
+}
+
+// Add craftsmen markers to map
+function addCraftsmenMarkers() {
+  if (!markersCluster || typeof L === 'undefined') return;
+  
+  markersCluster.clearLayers();
+  
+  craftsmenData.forEach(craftsman => {
+    const marker = L.marker([craftsman.lat, craftsman.lng]);
+    
+    const popupContent = `
+      <div style="min-width: 200px;">
+        <h6><strong>${craftsman.name}</strong></h6>
+        <p><i class="fas fa-tools"></i> ${getCraftTypeName(craftsman.type)}</p>
+        <p><i class="fas fa-map-marker-alt"></i> ${craftsman.address}</p>
+        <p><i class="fas fa-phone"></i> ${craftsman.phone}</p>
+        <p><i class="fas fa-star" style="color: #ffc107;"></i> ${craftsman.rating} (${craftsman.reviews} değerlendirme)</p>
+        <p><i class="fas fa-briefcase"></i> ${craftsman.experience} deneyim</p>
+        <button class="btn btn-sm btn-primary" onclick="selectCraftsman(${craftsman.id})">
+          İletişime Geç
+        </button>
+      </div>
+    `;
+    
+    marker.bindPopup(popupContent);
+    markersCluster.addLayer(marker);
+  });
+  
+  if (map) {
+    map.addLayer(markersCluster);
+  }
+}
+
+// Setup search controls
+function setupSearchControls() {
+  // Distance range slider update
+  document.getElementById('distanceRange').addEventListener('input', function(e) {
+    document.getElementById('distanceValue').textContent = e.target.value;
+  });
+  
+  // Search button
+  document.getElementById('searchBtn').addEventListener('click', performSearch);
+  
+  // Current location button
+  document.getElementById('getCurrentLocationBtn').addEventListener('click', getUserLocation);
+  
+  // Auto-search on filter changes
+  document.getElementById('craftSelect').addEventListener('change', performSearch);
+  document.getElementById('ratingFilter').addEventListener('change', performSearch);
+  document.getElementById('distanceRange').addEventListener('change', performSearch);
+}
+
+// Perform search with filters
+function performSearch() {
+  const location = document.getElementById('locationInput').value;
+  const craftType = document.getElementById('craftSelect').value;
+  const maxDistance = parseFloat(document.getElementById('distanceRange').value);
+  const minRating = parseFloat(document.getElementById('ratingFilter').value);
+  
+  // If location is specified, geocode it first
+  if (location && location !== 'Samsun, TR') {
+    geocodeLocation(location).then(coords => {
+      if (coords) {
+        userLocation = coords;
+        map.setView([coords.lat, coords.lng], 12);
+        filterAndDisplayResults(craftType, maxDistance, minRating);
+      }
+    });
+  } else {
+    // Use default Samsun location or user's current location
+    if (!userLocation) {
+      userLocation = { lat: 41.2867, lng: 36.3300 }; // Samsun center
+    }
+    filterAndDisplayResults(craftType, maxDistance, minRating);
+  }
+}
+
+// Simple geocoding function (using Nominatim)
+async function geocodeLocation(address) {
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
+    const data = await response.json();
+    
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon)
+      };
+    }
+  } catch (error) {
+    console.error('Geocoding error:', error);
+  }
+  return null;
+}
+
+// Filter and display results
+function filterAndDisplayResults(craftType, maxDistance, minRating) {
+  if (!userLocation) return;
+  
+  let filteredCraftsmen = craftsmenData.filter(craftsman => {
+    // Filter by craft type
+    if (craftType && craftsman.type !== craftType) return false;
+    
+    // Filter by rating
+    if (craftsman.rating < minRating) return false;
+    
+    // Calculate distance
+    const distance = calculateDistance(
+      userLocation.lat, userLocation.lng,
+      craftsman.lat, craftsman.lng
+    );
+    
+    // Filter by distance
+    if (distance > maxDistance) return false;
+    
+    craftsman.distance = distance;
+    return true;
+  });
+  
+  // Sort by distance
+  filteredCraftsmen.sort((a, b) => a.distance - b.distance);
+  
+  // Update results list
+  displayResults(filteredCraftsmen);
+  
+  // Update map markers
+  updateMapMarkers(filteredCraftsmen);
+}
+
+// Calculate distance between two points (Haversine formula)
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// Display search results
+function displayResults(craftsmen) {
+  const resultsList = document.getElementById('resultsList');
+  const resultCount = document.getElementById('resultCount');
+  
+  resultCount.textContent = craftsmen.length;
+  
+  if (craftsmen.length === 0) {
+    resultsList.innerHTML = '<p class="text-muted text-center">Arama kriterlerinize uygun usta bulunamadı.</p>';
+    return;
+  }
+  
+  const resultsHTML = craftsmen.map(craftsman => `
+    <div class="result-item" onclick="focusOnMarker(${craftsman.lat}, ${craftsman.lng})">
+      <div class="name">${craftsman.name}</div>
+      <div class="type">${getCraftTypeName(craftsman.type)}</div>
+      <div class="distance">
+        📍 ${craftsman.distance ? craftsman.distance.toFixed(1) + ' km uzaklıkta' : ''}
+        <span class="rating">⭐ ${craftsman.rating}</span>
+      </div>
+    </div>
+  `).join('');
+  
+  resultsList.innerHTML = resultsHTML;
+}
+
+// Update map markers based on filtered results
+function updateMapMarkers(filteredCraftsmen) {
+  if (!markersCluster || typeof L === 'undefined' || !map) return;
+  
+  markersCluster.clearLayers();
+  
+  // Add user location marker if available
+  if (userLocation) {
+    const userMarker = L.marker([userLocation.lat, userLocation.lng], {
+      icon: L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      })
+    }).bindPopup('📍 Konumunuz');
+    
+    markersCluster.addLayer(userMarker);
+  }
+  
+  // Add filtered craftsmen markers
+  filteredCraftsmen.forEach(craftsman => {
+    const marker = L.marker([craftsman.lat, craftsman.lng]);
+    
+    const popupContent = `
+      <div style="min-width: 200px;">
+        <h6><strong>${craftsman.name}</strong></h6>
+        <p><i class="fas fa-tools"></i> ${getCraftTypeName(craftsman.type)}</p>
+        <p><i class="fas fa-map-marker-alt"></i> ${craftsman.address}</p>
+        <p><i class="fas fa-phone"></i> ${craftsman.phone}</p>
+        <p><i class="fas fa-star" style="color: #ffc107;"></i> ${craftsman.rating} (${craftsman.reviews} değerlendirme)</p>
+        <p><i class="fas fa-briefcase"></i> ${craftsman.experience} deneyim</p>
+        ${craftsman.distance ? `<p><i class="fas fa-route"></i> ${craftsman.distance.toFixed(1)} km uzaklıkta</p>` : ''}
+        <button class="btn btn-sm btn-primary" onclick="selectCraftsman(${craftsman.id})">
+          İletişime Geç
+        </button>
+      </div>
+    `;
+    
+    marker.bindPopup(popupContent);
+    markersCluster.addLayer(marker);
+  });
+  
+  map.addLayer(markersCluster);
+}
+
+// Get user's current location
+function getUserLocation() {
+  if (navigator.geolocation) {
+    document.getElementById('getCurrentLocationBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Konum alınıyor...';
+    
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        
+        map.setView([userLocation.lat, userLocation.lng], 13);
+        document.getElementById('locationInput').value = 'Mevcut konumunuz';
+        document.getElementById('getCurrentLocationBtn').innerHTML = '<i class="fas fa-crosshairs"></i> Mevcut Konumumu Kullan';
+        
+        performSearch();
+      },
+      function(error) {
+        console.error('Geolocation error:', error);
+        alert('Konum bilgisi alınamadı. Lütfen manuel olarak konum girin.');
+        document.getElementById('getCurrentLocationBtn').innerHTML = '<i class="fas fa-crosshairs"></i> Mevcut Konumumu Kullan';
+      }
+    );
+  } else {
+    alert('Tarayıcınız konum servislerini desteklemiyor.');
+  }
+}
+
+// Focus on specific marker
+function focusOnMarker(lat, lng) {
+  if (!map || !markersCluster || typeof L === 'undefined') {
+    // If map is not available, just highlight the result item
+    return;
+  }
+  
+  map.setView([lat, lng], 15);
+  
+  // Find and open the marker popup
+  markersCluster.eachLayer(function(layer) {
+    if (layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
+      layer.openPopup();
+    }
+  });
+}
+
+// Select craftsman (contact action)
+function selectCraftsman(id) {
+  const craftsman = craftsmenData.find(c => c.id === id);
+  if (craftsman) {
+    alert(`${craftsman.name} ile iletişime geçiliyor...\nTelefon: ${craftsman.phone}`);
+    // Here you could implement actual contact functionality
+  }
+}
+
+// Get craft type display name
+function getCraftTypeName(type) {
+  const types = {
+    'elektrikci': '⚡ Elektrikçi',
+    'tesisatci': '🔧 Tesisatçı',
+    'boyaci': '🎨 Boyacı',
+    'marangoz': '🪵 Marangoz',
+    'tamirci': '🔨 Tamirci'
+  };
+  return types[type] || type;
+}
+
+// Initial search when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Perform initial search after a short delay
+  setTimeout(() => {
+    if (document.getElementById('UstaArama').classList.contains('visible')) {
+      performSearch();
+    }
+  }, 500);
+});
 </script>
 
 <script src="./script.js"></script>
