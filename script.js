@@ -297,20 +297,30 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
    GENERIC DIAGRAM BUILDER
 ═══════════════════════════════════════════════ */
 
+function makeMarker(NS, id, color, opacity) {
+  const marker = document.createElementNS(NS, 'marker');
+  marker.setAttribute('id', id);
+  marker.setAttribute('markerWidth', '10');
+  marker.setAttribute('markerHeight', '7');
+  marker.setAttribute('refX', '9');
+  marker.setAttribute('refY', '3.5');
+  marker.setAttribute('orient', 'auto');
+  const poly = document.createElementNS(NS, 'polygon');
+  poly.setAttribute('points', '0 0, 10 3.5, 0 7');
+  poly.setAttribute('fill', color);
+  if (opacity !== 1) poly.setAttribute('opacity', String(opacity));
+  marker.appendChild(poly);
+  return marker;
+}
+
 function buildDiagramSVG(svgId, nodes, edges, onSelect, W = 140, H = 58) {
   const svg = document.getElementById(svgId);
   const NS = 'http://www.w3.org/2000/svg';
   const uid = svgId; // unique prefix for marker IDs
 
   const defs = document.createElementNS(NS, 'defs');
-  defs.innerHTML = `
-    <marker id="arr-${uid}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#2e3248"/>
-    </marker>
-    <marker id="arr-fb-${uid}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#6c63ff" opacity="0.7"/>
-    </marker>
-  `;
+  defs.appendChild(makeMarker(NS, `arr-${uid}`, '#2e3248', 1));
+  defs.appendChild(makeMarker(NS, `arr-fb-${uid}`, '#6c63ff', 0.7));
   svg.appendChild(defs);
 
   const nodeMap = {};
