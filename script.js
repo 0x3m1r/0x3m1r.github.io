@@ -634,14 +634,20 @@ function buildStats() {
 
 /* ═══════════════════════════════════════════════
    TAB 4 — NOTLAR (Firebase Realtime Database)
-   Her not /notes/{id}.json olarak tutulur.
-   DB URL → localStorage: "fb_db_url"
-   Token/PAT gerekmez; test mode'da herkese açık.
+   Okuma herkese açık (.read: true).
+   Yazma sadece giriş yapana (.write: "auth != null").
+   DB URL  → localStorage: "fb_db_url"
+   API Key → localStorage: "fb_api_key"
+   Tokens  → localStorage: "fb_id_token", "fb_refresh_token", "fb_token_expiry"
 ═══════════════════════════════════════════════ */
 
-let fbUrl      = localStorage.getItem('fb_db_url') || '';
-let notesCache = [];
-let editingId  = null;
+let fbUrl          = localStorage.getItem('fb_db_url')        || '';
+let fbApiKey       = localStorage.getItem('fb_api_key')       || '';
+let fbIdToken      = localStorage.getItem('fb_id_token')      || '';
+let fbRefreshToken = localStorage.getItem('fb_refresh_token') || '';
+let fbTokenExpiry  = parseInt(localStorage.getItem('fb_token_expiry') || '0', 10);
+let notesCache     = [];
+let editingId      = null;
 
 /* ── helpers ──────────────────────────────── */
 
@@ -662,6 +668,12 @@ function hint(msg, type = '') {
   el.className = 'form-hint' + (type ? ' ' + type : '');
 }
 
+function loginHint(msg, type = '') {
+  const el = document.getElementById('login-hint');
+  el.textContent = msg;
+  el.className = 'form-hint' + (type ? ' ' + type : '');
+}
+
 function setTokenStatus(ok, msg) {
   const el = document.getElementById('token-status');
   el.textContent = msg;
@@ -672,7 +684,78 @@ function fbBase() {
   return fbUrl.replace(/\/?$/, '');
 }
 
-/* ── Firebase REST API ────────────────────── */
+function isAuthed() {
+  return !!(fbRefreshToken);
+}
+
+function updateAuthUI() {
+  const ready  = !!(fbUrl && fbApiKey);
+  const authed = isAuthed();
+  document.getElementById('note-form').style.display    = authed        ? ''     : 'none';
+  document.getElementById('login-section').style.display = (!authed && ready) ? ''     : 'none';
+  document.getElementById('btn-logout').style.display   = authed        ? ''     : 'none';
+}
+
+/* ── Firebase Auth REST ───────────────────── */
+
+async function fbSignIn(email, password) {
+  const r = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${fbApiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true }),
+    }
+  );
+  if (!r.ok) {
+    const err = await r.json();
+    const code = err.error?.message || 'UNKNOWN';
+    const msg  = code === 'INVALID_PASSWORD' || code === 'EMAIL_NOT_FOUND' || code.startsWith('INVALID_LOGIN')
+      ? 'E-posta veya şifre hatalı.' : `Hata: ${code}`;
+    throw new Error(msg);
+  }
+  const d = await r.json();
+  storeTokens(d.idToken, d.refreshToken, parseInt(d.expiresIn, 10));
+}
+
+async function fbRefresh() {
+  const r = await fetch(
+    `https://securetoken.googleapis.com/v1/token?key=${fbApiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grant_type: 'refresh_token', refresh_token: fbRefreshToken }),
+    }
+  );
+  if (!r.ok) throw new Error('Token yenilenemedi — lütfen tekrar giriş yap.');
+  const d = await r.json();
+  storeTokens(d.id_token, d.refresh_token, parseInt(d.expires_in, 10));
+}
+
+function storeTokens(idToken, refreshToken, expiresIn) {
+  fbIdToken      = idToken;
+  fbRefreshToken = refreshToken;
+  fbTokenExpiry  = Date.now() + expiresIn * 1000;
+  localStorage.setItem('fb_id_token',      fbIdToken);
+  localStorage.setItem('fb_refresh_token', fbRefreshToken);
+  localStorage.setItem('fb_token_expiry',  fbTokenExpiry.toString());
+}
+
+async function fbGetToken() {
+  if (!fbRefreshToken) throw new Error('Giriş yapılmamış.');
+  if (fbTokenExpiry - Date.now() < 60_000) await fbRefresh();
+  return fbIdToken;
+}
+
+function fbLogout() {
+  fbIdToken = fbRefreshToken = '';
+  fbTokenExpiry = 0;
+  localStorage.removeItem('fb_id_token');
+  localStorage.removeItem('fb_refresh_token');
+  localStorage.removeItem('fb_token_expiry');
+}
+
+/* ── Firebase Realtime DB REST ────────────── */
 
 async function fbLoad() {
   const r = await fetch(`${fbBase()}/notes.json`);
@@ -683,7 +766,8 @@ async function fbLoad() {
 }
 
 async function fbPut(note) {
-  const r = await fetch(`${fbBase()}/notes/${note.id}.json`, {
+  const token = await fbGetToken();
+  const r = await fetch(`${fbBase()}/notes/${note.id}.json?auth=${token}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(note),
@@ -692,18 +776,20 @@ async function fbPut(note) {
 }
 
 async function fbDelete(id) {
-  const r = await fetch(`${fbBase()}/notes/${id}.json`, { method: 'DELETE' });
+  const token = await fbGetToken();
+  const r = await fetch(`${fbBase()}/notes/${id}.json?auth=${token}`, { method: 'DELETE' });
   if (!r.ok) throw new Error(`Firebase DELETE ${r.status}`);
 }
 
 /* ── load & render ────────────────────────── */
 
 async function loadNotes() {
-  if (!fbUrl) { setTokenStatus(null, '⚪ URL girilmedi'); return; }
+  if (!fbUrl) { setTokenStatus(null, '⚪ Ayarlar eksik'); return; }
   setTokenStatus(null, '⏳ Yükleniyor…');
   try {
     notesCache = await fbLoad();
-    setTokenStatus(true, '🟢 Firebase bağlı');
+    const authLabel = isAuthed() ? ' · Giriş yapıldı' : ' · Salt okunur';
+    setTokenStatus(true, '🟢 Firebase bağlı' + authLabel);
     renderNotes(notesCache);
   } catch (e) {
     setTokenStatus(false, '🔴 Hata: ' + e.message);
@@ -717,20 +803,21 @@ function renderNotes(notes) {
   count.textContent = notes.length ? `${notes.length} not` : '';
 
   if (!notes.length) {
-    list.innerHTML = '<div class="notes-empty"><p>Henüz not yok. İlk notunu ekle →</p></div>';
+    list.innerHTML = '<div class="notes-empty"><p>Henüz not yok.</p></div>';
     return;
   }
 
+  const showActions = isAuthed();
   const cards = notes.slice().reverse().map(n => {
-    const tags = (n.tags || []).map(t => `<span class="note-tag">${t}</span>`).join('');
+    const tags = (n.tags || []).map(t => `<span class="note-tag">${esc(t)}</span>`).join('');
     return `
       <div class="note-card" data-id="${n.id}">
         <div class="note-card-header">
           <div class="note-card-title">${esc(n.title)}</div>
-          <div class="note-card-actions">
+          ${showActions ? `<div class="note-card-actions">
             <button class="note-icon-btn edit" onclick="startEdit('${n.id}')" title="Düzenle">✏️</button>
             <button class="note-icon-btn del"  onclick="deleteNote('${n.id}')" title="Sil">🗑️</button>
-          </div>
+          </div>` : ''}
         </div>
         ${tags ? `<div class="note-card-tags">${tags}</div>` : ''}
         <div class="note-card-body">${esc(n.body)}</div>
@@ -755,17 +842,45 @@ document.getElementById('notes-search').addEventListener('input', function () {
   ));
 });
 
+/* ── login / logout ───────────────────────── */
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { loginHint('E-posta ve şifre gir.', 'err'); return; }
+  document.getElementById('btn-login').disabled = true;
+  loginHint('Giriş yapılıyor…');
+  try {
+    await fbSignIn(email, password);
+    document.getElementById('login-password').value = '';
+    loginHint('');
+    updateAuthUI();
+    setTokenStatus(true, '🟢 Firebase bağlı · Giriş yapıldı');
+    renderNotes(notesCache);
+  } catch (e) {
+    loginHint(e.message, 'err');
+  } finally {
+    document.getElementById('btn-login').disabled = false;
+  }
+});
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+  fbLogout();
+  updateAuthUI();
+  setTokenStatus(true, '🟢 Firebase bağlı · Salt okunur');
+  renderNotes(notesCache);
+});
+
 /* ── save / edit / delete ─────────────────── */
 
 document.getElementById('btn-save').addEventListener('click', saveNote);
 
 async function saveNote() {
-  const title = document.getElementById('note-title').value.trim();
-  const body  = document.getElementById('note-body').value.trim();
+  const title   = document.getElementById('note-title').value.trim();
+  const body    = document.getElementById('note-body').value.trim();
   const rawTags = document.getElementById('note-tags').value;
   if (!title) { hint('Başlık boş olamaz.', 'err'); return; }
   if (!body)  { hint('Not içeriği boş olamaz.', 'err'); return; }
-  if (!fbUrl) { hint('Önce Firebase URL gir.', 'err'); return; }
 
   const tags = rawTags.match(/#[\wÀ-ɏ]+/g)?.map(t => t.slice(1)) || [];
   const now  = new Date().toISOString();
@@ -800,7 +915,7 @@ function startEdit(id) {
   document.getElementById('note-title').value = n.title;
   document.getElementById('note-body').value  = n.body;
   document.getElementById('note-tags').value  = (n.tags||[]).map(t => '#'+t).join(' ');
-  document.getElementById('form-title').textContent  = '✏️ Notu Düzenle';
+  document.getElementById('form-title').textContent   = '✏️ Notu Düzenle';
   document.getElementById('btn-cancel').style.display = '';
   document.getElementById('note-title').focus();
   hint('');
@@ -813,7 +928,7 @@ function clearForm() {
   document.getElementById('note-title').value = '';
   document.getElementById('note-body').value  = '';
   document.getElementById('note-tags').value  = '';
-  document.getElementById('form-title').textContent  = '+ Yeni Not';
+  document.getElementById('form-title').textContent   = '+ Yeni Not';
   document.getElementById('btn-cancel').style.display = 'none';
   hint('');
 }
@@ -831,10 +946,11 @@ async function deleteNote(id) {
   }
 }
 
-/* ── token modal ──────────────────────────── */
+/* ── ayarlar modal ────────────────────────── */
 
 document.getElementById('token-btn').addEventListener('click', () => {
-  document.getElementById('modal-token').value = fbUrl;
+  document.getElementById('modal-dburl').value  = fbUrl;
+  document.getElementById('modal-apikey').value = fbApiKey;
   document.getElementById('modal-overlay').style.display = 'flex';
 });
 
@@ -843,11 +959,13 @@ document.getElementById('modal-cancel').addEventListener('click', () => {
 });
 
 document.getElementById('modal-save').addEventListener('click', async () => {
-  const url = document.getElementById('modal-token').value.trim().replace(/\/?$/, '');
-  if (!url) return;
-  fbUrl = url;
-  localStorage.setItem('fb_db_url', url);
+  const url    = document.getElementById('modal-dburl').value.trim().replace(/\/?$/, '');
+  const apikey = document.getElementById('modal-apikey').value.trim();
+  if (!url || !apikey) return;
+  fbUrl    = url;    localStorage.setItem('fb_db_url',  url);
+  fbApiKey = apikey; localStorage.setItem('fb_api_key', apikey);
   document.getElementById('modal-overlay').style.display = 'none';
+  updateAuthUI();
   await loadNotes();
 });
 
@@ -858,8 +976,9 @@ document.querySelector('[data-tab="resources"]').addEventListener('click', () =>
 });
 
 function initNotes() {
+  updateAuthUI();
   if (fbUrl) loadNotes();
-  else setTokenStatus(null, '⚪ URL girilmedi — URL Ayarla\'ya tıkla');
+  else setTokenStatus(null, '⚪ Ayarlar girilmedi — Ayarlar\'a tıkla');
 }
 
 /* ═══════════════════════════════════════════════

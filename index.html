@@ -60,14 +60,29 @@
       <section id="tab-resources" class="tab-content">
         <div class="notes-layout">
 
-          <!-- Sol: form + token -->
+          <!-- Sol: form + auth -->
           <div class="notes-sidebar">
             <div class="token-bar" id="token-bar">
               <span class="token-status" id="token-status">⚪ Bağlantı kurulmadı</span>
-              <button class="btn-ghost" id="token-btn">URL Ayarla</button>
+              <div class="token-bar-actions">
+                <button class="btn-ghost" id="btn-logout" style="display:none">Çıkış</button>
+                <button class="btn-ghost" id="token-btn">Ayarlar</button>
+              </div>
             </div>
 
-            <div class="note-form" id="note-form">
+            <!-- Giriş formu — sadece auth yokken görünür -->
+            <div class="note-form" id="login-section" style="display:none">
+              <h3 class="form-title">Giriş Yap</h3>
+              <input id="login-email"    class="note-input" type="email"    placeholder="E-posta" autocomplete="email" />
+              <input id="login-password" class="note-input" type="password" placeholder="Şifre"   autocomplete="current-password" />
+              <div class="form-actions">
+                <button class="btn-save" id="btn-login">Giriş</button>
+              </div>
+              <p class="form-hint" id="login-hint"></p>
+            </div>
+
+            <!-- Not formu — sadece giriş yapılınca görünür -->
+            <div class="note-form" id="note-form" style="display:none">
               <h3 class="form-title" id="form-title">+ Yeni Not</h3>
               <input id="note-title"   class="note-input" type="text"     placeholder="Başlık" />
               <input id="note-tags"    class="note-input" type="text"     placeholder="Etiketler  (#ml #python)" />
@@ -91,14 +106,16 @@
 
         </div>
 
-        <!-- Token modal -->
+        <!-- Ayarlar modal -->
         <div class="modal-overlay" id="modal-overlay" style="display:none">
           <div class="modal-box">
-            <h3>Firebase URL Ayarı</h3>
-            <p>Notlar <strong>Firebase Realtime Database</strong>'de tutulur — commit yok, rebuild yok.<br>
-               <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → proje oluştur → Realtime Database → <em>test mode</em>.<br>
-               Database URL'sini buraya yapıştır.</p>
-            <input class="note-input" id="modal-token" type="text" placeholder="https://proje-xxxx-default-rtdb.firebaseio.com" />
+            <h3>Firebase Ayarları</h3>
+            <p>
+              <strong>Database URL</strong> — Realtime Database sayfasındaki URL.<br>
+              <strong>API Key</strong> — Project Settings → General → Web app → apiKey.
+            </p>
+            <input class="note-input" id="modal-dburl"  type="text" placeholder="https://proje-xxxx-default-rtdb.firebaseio.com" />
+            <input class="note-input" id="modal-apikey" type="text" placeholder="AIzaSy..." />
             <div class="form-actions">
               <button class="btn-save" id="modal-save">Kaydet</button>
               <button class="btn-cancel" id="modal-cancel">İptal</button>

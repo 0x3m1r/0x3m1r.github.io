@@ -356,6 +356,7 @@ main { flex: 1; padding: 1.5rem 2rem; }
   gap: 0.5rem;
 }
 
+.token-bar-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
 .token-status { font-size: 0.8rem; color: var(--text-muted); }
 .token-status.ok { color: var(--accent2); }
 .token-status.err { color: #ef4444; }
