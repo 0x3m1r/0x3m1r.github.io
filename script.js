@@ -633,18 +633,13 @@ function buildStats() {
 }
 
 /* ═══════════════════════════════════════════════
-   TAB 4 — NOTLAR (GitHub Gist backed)
-   notes.json ← GET/PATCH via GitHub Gist API
-   PAT (classic, gist scope) → localStorage: "gh_pat"
-   Gist ID                   → localStorage: "gh_gist_id"
-   Repo'ya commit atmaz, Pages rebuild tetiklemez.
+   TAB 4 — NOTLAR (Firebase Realtime Database)
+   Her not /notes/{id}.json olarak tutulur.
+   DB URL → localStorage: "fb_db_url"
+   Token/PAT gerekmez; test mode'da herkese açık.
 ═══════════════════════════════════════════════ */
 
-const GIST_FILE = 'notes.json';
-const GIST_API  = 'https://api.github.com/gists';
-
-let ghPAT      = localStorage.getItem('gh_pat')      || '';
-let gistId     = localStorage.getItem('gh_gist_id')  || '';
+let fbUrl      = localStorage.getItem('fb_db_url') || '';
 let notesCache = [];
 let editingId  = null;
 
@@ -673,53 +668,42 @@ function setTokenStatus(ok, msg) {
   el.className = 'token-status ' + (ok === true ? 'ok' : ok === false ? 'err' : '');
 }
 
-function ghHeaders() {
-  return { Authorization: `Bearer ${ghPAT}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+function fbBase() {
+  return fbUrl.replace(/\/?$/, '');
 }
 
-/* ── Gist API ─────────────────────────────── */
+/* ── Firebase REST API ────────────────────── */
 
-async function gistLoad() {
-  const r = await fetch(`${GIST_API}/${gistId}`, { headers: ghHeaders() });
-  if (!r.ok) throw new Error(`Gist GET ${r.status}`);
+async function fbLoad() {
+  const r = await fetch(`${fbBase()}/notes.json`);
+  if (!r.ok) throw new Error(`Firebase GET ${r.status}`);
   const data = await r.json();
-  return JSON.parse(data.files[GIST_FILE].content);
+  if (!data) return [];
+  return Object.values(data).sort((a, b) => (a.created || '').localeCompare(b.created || ''));
 }
 
-async function gistSave(notes) {
-  const r = await fetch(`${GIST_API}/${gistId}`, {
-    method: 'PATCH',
-    headers: ghHeaders(),
-    body: JSON.stringify({ files: { [GIST_FILE]: { content: JSON.stringify(notes, null, 2) } } }),
+async function fbPut(note) {
+  const r = await fetch(`${fbBase()}/notes/${note.id}.json`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(note),
   });
-  if (!r.ok) throw new Error(`Gist PATCH ${r.status}`);
+  if (!r.ok) throw new Error(`Firebase PUT ${r.status}`);
 }
 
-async function gistCreate() {
-  const r = await fetch(GIST_API, {
-    method: 'POST',
-    headers: ghHeaders(),
-    body: JSON.stringify({
-      description: "Ramming's Cave — notlar",
-      public: true,
-      files: { [GIST_FILE]: { content: '[]' } },
-    }),
-  });
-  if (!r.ok) throw new Error(`Gist CREATE ${r.status}`);
-  const data = await r.json();
-  gistId = data.id;
-  localStorage.setItem('gh_gist_id', gistId);
+async function fbDelete(id) {
+  const r = await fetch(`${fbBase()}/notes/${id}.json`, { method: 'DELETE' });
+  if (!r.ok) throw new Error(`Firebase DELETE ${r.status}`);
 }
 
 /* ── load & render ────────────────────────── */
 
 async function loadNotes() {
-  if (!ghPAT) { setTokenStatus(null, '⚪ Token girilmedi'); return; }
+  if (!fbUrl) { setTokenStatus(null, '⚪ URL girilmedi'); return; }
   setTokenStatus(null, '⏳ Yükleniyor…');
   try {
-    if (!gistId) await gistCreate();
-    notesCache = await gistLoad();
-    setTokenStatus(true, '🟢 Gist bağlı');
+    notesCache = await fbLoad();
+    setTokenStatus(true, '🟢 Firebase bağlı');
     renderNotes(notesCache);
   } catch (e) {
     setTokenStatus(false, '🔴 Hata: ' + e.message);
@@ -781,7 +765,7 @@ async function saveNote() {
   const rawTags = document.getElementById('note-tags').value;
   if (!title) { hint('Başlık boş olamaz.', 'err'); return; }
   if (!body)  { hint('Not içeriği boş olamaz.', 'err'); return; }
-  if (!ghPAT) { hint('Önce GitHub token gir.', 'err'); return; }
+  if (!fbUrl) { hint('Önce Firebase URL gir.', 'err'); return; }
 
   const tags = rawTags.match(/#[\wÀ-ɏ]+/g)?.map(t => t.slice(1)) || [];
   const now  = new Date().toISOString();
@@ -790,14 +774,15 @@ async function saveNote() {
   hint('Kaydediliyor…');
 
   try {
+    let note;
     if (editingId) {
-      notesCache = notesCache.map(n =>
-        n.id === editingId ? { ...n, title, body, tags, updated: now } : n
-      );
+      note = { ...notesCache.find(n => n.id === editingId), title, body, tags, updated: now };
+      notesCache = notesCache.map(n => n.id === editingId ? note : n);
     } else {
-      notesCache.push({ id: uid(), title, body, tags, created: now, updated: now });
+      note = { id: uid(), title, body, tags, created: now, updated: now };
+      notesCache.push(note);
     }
-    await gistSave(notesCache);
+    await fbPut(note);
     hint('✓ Kaydedildi', 'ok');
     clearForm();
     renderNotes(notesCache);
@@ -838,7 +823,7 @@ async function deleteNote(id) {
   notesCache = notesCache.filter(n => n.id !== id);
   hint('Siliniyor…');
   try {
-    await gistSave(notesCache);
+    await fbDelete(id);
     hint('✓ Silindi', 'ok');
     renderNotes(notesCache);
   } catch (e) {
@@ -849,7 +834,7 @@ async function deleteNote(id) {
 /* ── token modal ──────────────────────────── */
 
 document.getElementById('token-btn').addEventListener('click', () => {
-  document.getElementById('modal-token').value = ghPAT;
+  document.getElementById('modal-token').value = fbUrl;
   document.getElementById('modal-overlay').style.display = 'flex';
 });
 
@@ -858,10 +843,10 @@ document.getElementById('modal-cancel').addEventListener('click', () => {
 });
 
 document.getElementById('modal-save').addEventListener('click', async () => {
-  const t = document.getElementById('modal-token').value.trim();
-  if (!t) return;
-  ghPAT = t;
-  localStorage.setItem('gh_pat', t);
+  const url = document.getElementById('modal-token').value.trim().replace(/\/?$/, '');
+  if (!url) return;
+  fbUrl = url;
+  localStorage.setItem('fb_db_url', url);
   document.getElementById('modal-overlay').style.display = 'none';
   await loadNotes();
 });
@@ -869,12 +854,12 @@ document.getElementById('modal-save').addEventListener('click', async () => {
 /* ── load when tab is first opened ───────── */
 
 document.querySelector('[data-tab="resources"]').addEventListener('click', () => {
-  if (!notesCache.length && ghPAT) loadNotes();
+  if (!notesCache.length && fbUrl) loadNotes();
 });
 
 function initNotes() {
-  if (ghPAT) loadNotes();
-  else setTokenStatus(null, '⚪ Token girilmedi — Token Ayarla\'ya tıkla');
+  if (fbUrl) loadNotes();
+  else setTokenStatus(null, '⚪ URL girilmedi — URL Ayarla\'ya tıkla');
 }
 
 /* ═══════════════════════════════════════════════
