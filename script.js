@@ -633,20 +633,20 @@ function buildStats() {
 }
 
 /* ═══════════════════════════════════════════════
-   TAB 4 — NOTLAR (GitHub repo backed)
-   notes.json ← GET/PUT via GitHub Contents API
-   PAT → localStorage key: "gh_pat"
+   TAB 4 — NOTLAR (GitHub Gist backed)
+   notes.json ← GET/PATCH via GitHub Gist API
+   PAT (classic, gist scope) → localStorage: "gh_pat"
+   Gist ID                   → localStorage: "gh_gist_id"
+   Repo'ya commit atmaz, Pages rebuild tetiklemez.
 ═══════════════════════════════════════════════ */
 
-const GH_OWNER = '0x3m1r';
-const GH_REPO  = '0x3m1r.github.io';
-const GH_FILE  = 'notes.json';
-const GH_API   = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+const GIST_FILE = 'notes.json';
+const GIST_API  = 'https://api.github.com/gists';
 
-let ghPAT      = localStorage.getItem('gh_pat') || '';
-let notesCache = [];   // in-memory note array
-let notesSHA   = '';   // file SHA (required for PUT)
-let editingId  = null; // id of note being edited
+let ghPAT      = localStorage.getItem('gh_pat')      || '';
+let gistId     = localStorage.getItem('gh_gist_id')  || '';
+let notesCache = [];
+let editingId  = null;
 
 /* ── helpers ──────────────────────────────── */
 
@@ -670,37 +670,45 @@ function hint(msg, type = '') {
 function setTokenStatus(ok, msg) {
   const el = document.getElementById('token-status');
   el.textContent = msg;
-  el.className = 'token-status ' + (ok ? 'ok' : (ok === false ? 'err' : ''));
+  el.className = 'token-status ' + (ok === true ? 'ok' : ok === false ? 'err' : '');
 }
 
-/* ── GitHub API ───────────────────────────── */
-
-async function ghGet() {
-  const r = await fetch(GH_API, {
-    headers: { Authorization: `Bearer ${ghPAT}`, Accept: 'application/vnd.github+json' },
-  });
-  if (r.status === 404) { notesSHA = ''; return []; }
-  if (!r.ok) throw new Error(`GitHub GET ${r.status}`);
-  const data = await r.json();
-  notesSHA = data.sha;
-  return JSON.parse(atob(data.content.replace(/\n/g, '')));
+function ghHeaders() {
+  return { Authorization: `Bearer ${ghPAT}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
 }
 
-async function ghPut(notes) {
-  const body = { message: 'notlar güncellendi', content: btoa(unescape(encodeURIComponent(JSON.stringify(notes, null, 2)))) };
-  if (notesSHA) body.sha = notesSHA;
-  const r = await fetch(GH_API, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${ghPAT}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) throw new Error(`GitHub PUT ${r.status}`);
+/* ── Gist API ─────────────────────────────── */
+
+async function gistLoad() {
+  const r = await fetch(`${GIST_API}/${gistId}`, { headers: ghHeaders() });
+  if (!r.ok) throw new Error(`Gist GET ${r.status}`);
   const data = await r.json();
-  notesSHA = data.content.sha;
+  return JSON.parse(data.files[GIST_FILE].content);
+}
+
+async function gistSave(notes) {
+  const r = await fetch(`${GIST_API}/${gistId}`, {
+    method: 'PATCH',
+    headers: ghHeaders(),
+    body: JSON.stringify({ files: { [GIST_FILE]: { content: JSON.stringify(notes, null, 2) } } }),
+  });
+  if (!r.ok) throw new Error(`Gist PATCH ${r.status}`);
+}
+
+async function gistCreate() {
+  const r = await fetch(GIST_API, {
+    method: 'POST',
+    headers: ghHeaders(),
+    body: JSON.stringify({
+      description: "Ramming's Cave — notlar",
+      public: true,
+      files: { [GIST_FILE]: { content: '[]' } },
+    }),
+  });
+  if (!r.ok) throw new Error(`Gist CREATE ${r.status}`);
+  const data = await r.json();
+  gistId = data.id;
+  localStorage.setItem('gh_gist_id', gistId);
 }
 
 /* ── load & render ────────────────────────── */
@@ -709,11 +717,12 @@ async function loadNotes() {
   if (!ghPAT) { setTokenStatus(null, '⚪ Token girilmedi'); return; }
   setTokenStatus(null, '⏳ Yükleniyor…');
   try {
-    notesCache = await ghGet();
-    setTokenStatus(true, '🟢 GitHub bağlı');
+    if (!gistId) await gistCreate();
+    notesCache = await gistLoad();
+    setTokenStatus(true, '🟢 Gist bağlı');
     renderNotes(notesCache);
   } catch (e) {
-    setTokenStatus(false, '🔴 Bağlantı hatası');
+    setTokenStatus(false, '🔴 Hata: ' + e.message);
   }
 }
 
@@ -785,7 +794,7 @@ async function saveNote() {
     } else {
       notesCache.push({ id: uid(), title, body, tags, created: now, updated: now });
     }
-    await ghPut(notesCache);
+    await gistSave(notesCache);
     hint('✓ Kaydedildi', 'ok');
     clearForm();
     renderNotes(notesCache);
@@ -826,7 +835,7 @@ async function deleteNote(id) {
   notesCache = notesCache.filter(n => n.id !== id);
   hint('Siliniyor…');
   try {
-    await ghPut(notesCache);
+    await gistSave(notesCache);
     hint('✓ Silindi', 'ok');
     renderNotes(notesCache);
   } catch (e) {

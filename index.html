@@ -99,8 +99,9 @@
         <div class="modal-overlay" id="modal-overlay" style="display:none">
           <div class="modal-box">
             <h3>GitHub Token Ayarı</h3>
-            <p>Notlar <code>0x3m1r/0x3m1r.github.io</code> reposundaki <code>notes.json</code> dosyasında tutulur.<br>
-               Okuma/yazma için <strong>Contents</strong> yetkili bir GitHub Personal Access Token gir.</p>
+            <p>Notlar bir <strong>GitHub Gist</strong>'te tutulur — repoya commit atmaz.<br>
+               <strong>Classic PAT</strong> oluştur, sadece <code>gist</code> scope'unu işaretle.<br>
+               İlk girişte Gist otomatik oluşturulur.</p>
             <input class="note-input" id="modal-token" type="password" placeholder="ghp_xxxxxxxxxxxx" />
             <div class="form-actions">
               <button class="btn-save" id="modal-save">Kaydet</button>
