@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veri Analizi Rehberi</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Veri Analizi Rehberi</h1>
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="diagram">ER Diyagramı</button>
+        <button class="tab-btn" data-tab="tools">Araçlar</button>
+        <button class="tab-btn" data-tab="stats">İstatistik</button>
+        <button class="tab-btn" data-tab="resources">Kaynaklar</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- TAB 1: ER Diagram -->
+      <section id="tab-diagram" class="tab-content active">
+        <div class="diagram-layout">
+          <div class="diagram-area">
+            <svg id="diagram-svg" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="detail-panel" id="detail-panel">
+            <div class="detail-placeholder">
+              <span class="arrow-hint">←</span>
+              <p>Bir aşamaya tıklayın</p>
+            </div>
+            <div class="detail-content" id="detail-content" style="display:none"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Tools -->
+      <section id="tab-tools" class="tab-content">
+        <div class="tools-grid" id="tools-grid"></div>
+      </section>
+
+      <!-- TAB 3: Statistics -->
+      <section id="tab-stats" class="tab-content">
+        <div class="stats-container" id="stats-container"></div>
+      </section>
+
+      <!-- TAB 4: Resources -->
+      <section id="tab-resources" class="tab-content">
+        <div class="resources-list" id="resources-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
