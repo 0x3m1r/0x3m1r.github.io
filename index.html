@@ -65,6 +65,63 @@
     <div class="col-md-12">
       <h1 class="text-center mt-5">Welcome to 0x3m1r's Dashboard</h1>
       <p class="text-center">This is a simple dashboard template with a CV section.</p>
+      <div class="analysis-guide card mt-4">
+        <div class="card-body">
+          <h2 class="card-title">Veri Analizi Kılavuzu</h2>
+          <div class="analysis-tab-buttons mb-3">
+            <button class="analysis-tab active" data-tab="overview">Genel Bakış</button>
+            <button class="analysis-tab" data-tab="process">Aşamalar</button>
+            <button class="analysis-tab" data-tab="er-diagram">ER Diyagramı</button>
+            <button class="analysis-tab" data-tab="tips">Hızlı İpucu</button>
+          </div>
+
+          <div class="analysis-tab-panel active" id="tab-overview">
+            <div class="overview-card">
+              <h3>Veri analizi sürecinin dört temel bakışı</h3>
+              <ul>
+                <li>Veri toplama ve kaynakları doğrulama</li>
+                <li>Veri temizleme ile tutarlılığı sağlama</li>
+                <li>Özellik mühendisliği ve modelleme</li>
+                <li>Sonuçları yorumlayıp raporlama</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="analysis-tab-panel" id="tab-process">
+            <div class="stage-list">
+              <div class="stage-item"><strong>1. Veri Toplama</strong> — Kaynakları seç, veri kalitesini kontrol et.</div>
+              <div class="stage-item"><strong>2. Veri Temizleme</strong> — Eksik değerleri tamamla, hataları düzelt, gereksiz satırları kaldır.</div>
+              <div class="stage-item"><strong>3. Özellik Mühendisliği</strong> — Veri dönüştürme, nitelikleri kodlama, yeni göstergeler oluşturma.</div>
+              <div class="stage-item"><strong>4. Modelleme</strong> — Algoritmayı seç, eğit, test et ve sonuçları değerlendir.</div>
+            </div>
+          </div>
+
+          <div class="analysis-tab-panel" id="tab-er-diagram">
+            <div class="er-diagram">
+              <div class="er-node active" data-stage="source">Veri Kaynağı</div>
+              <div class="er-node" data-stage="cleaning">Temizleme</div>
+              <div class="er-node" data-stage="features">Özellik Mühendisliği</div>
+              <div class="er-node" data-stage="modeling">Modelleme</div>
+            </div>
+            <div class="diagram-details" id="diagramDetails">
+              <h4>Bir aşama seçin</h4>
+              <p>ER diyagramında bir kutuya tıkladığınızda, o aşamadaki görevler burada görünecek.</p>
+            </div>
+          </div>
+
+          <div class="analysis-tab-panel" id="tab-tips">
+            <div class="tip-card">
+              <h3>Hızlı Veri Analizi İpuçları</h3>
+              <ul>
+                <li>Veri kalitesi, analiz başarısının temelidir.</li>
+                <li>Her aşamada geri dönüp kontrol et, doğrulama adımlarını atlama.</li>
+                <li>ER diyagramı ile veri ilişkilerini görselleştir.</li>
+                <li>Tekrarlanabilir bir analiz akışı oluştur.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
       <iframe src="https://tryhackme.com/api/v2/badges/public-profile?userPublicId=2133455" style='border:none;'></iframe>
       <div class="text-center mt-4">
         <button class="btn btn-outline-success" id="playGameBtn">
