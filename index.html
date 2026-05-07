@@ -12,7 +12,7 @@
       <h1>Ramming's Cave</h1>
       <nav class="tabs">
         <button class="tab-btn active" data-tab="diagram">ER Diyagramı</button>
-        <button class="tab-btn" data-tab="tools">Araçlar</button>
+        <button class="tab-btn" data-tab="aimodel">YZ Modeli</button>
         <button class="tab-btn" data-tab="stats">İstatistik</button>
         <button class="tab-btn" data-tab="resources">Kaynaklar</button>
       </nav>
@@ -35,9 +35,20 @@
         </div>
       </section>
 
-      <!-- TAB 2: Tools -->
-      <section id="tab-tools" class="tab-content">
-        <div class="tools-grid" id="tools-grid"></div>
+      <!-- TAB 2: AI Model Design -->
+      <section id="tab-aimodel" class="tab-content">
+        <div class="diagram-layout">
+          <div class="diagram-area">
+            <svg id="ai-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div class="detail-panel" id="ai-detail-panel">
+            <div class="detail-placeholder" id="ai-placeholder">
+              <span class="arrow-hint">←</span>
+              <p>Bir aşamaya tıklayın</p>
+            </div>
+            <div class="detail-content" id="ai-detail-content" style="display:none"></div>
+          </div>
+        </div>
       </section>
 
       <!-- TAB 3: Statistics -->

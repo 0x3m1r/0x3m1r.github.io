@@ -134,6 +134,8 @@ main { flex: 1; padding: 1.5rem 2rem; }
 }
 
 .er-edge.highlight { stroke: var(--accent); stroke-width: 2.5; opacity: 0.8; }
+.er-edge.feedback { stroke-dasharray: 8 4; stroke: var(--accent); opacity: 0.55; }
+.er-edge.feedback.highlight { opacity: 0.9; }
 
 .edge-label {
   fill: var(--text-muted);
@@ -242,6 +244,18 @@ main { flex: 1; padding: 1.5rem 2rem; }
 }
 
 .chip.accent { border-color: var(--accent); color: var(--accent); }
+
+.pitfall-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-left: 3px solid #ef4444;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.82rem;
+  color: #fca5a5;
+  line-height: 1.55;
+  margin-top: 0.5rem;
+}
 
 /* ─── TOOLS TAB ─── */
 .tools-grid {
