@@ -728,10 +728,14 @@ async function loadNotes() {
 
 function renderNotes(notes) {
   const list  = document.getElementById('notes-list');
-  const empty = document.getElementById('notes-empty');
   const count = document.getElementById('notes-count');
 
   count.textContent = notes.length ? `${notes.length} not` : '';
+
+  if (!notes.length) {
+    list.innerHTML = '<div class="notes-empty"><p>Henüz not yok. İlk notunu ekle →</p></div>';
+    return;
+  }
 
   const cards = notes.slice().reverse().map(n => {
     const tags = (n.tags || []).map(t => `<span class="note-tag">${t}</span>`).join('');
@@ -751,7 +755,6 @@ function renderNotes(notes) {
   }).join('');
 
   list.innerHTML = cards;
-  empty.style.display = notes.length ? 'none' : 'block';
 }
 
 function esc(s) {
