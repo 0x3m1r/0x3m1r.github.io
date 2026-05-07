@@ -633,31 +633,236 @@ function buildStats() {
 }
 
 /* ═══════════════════════════════════════════════
-   TAB 4 — KAYNAKLAR
+   TAB 4 — NOTLAR (GitHub repo backed)
+   notes.json ← GET/PUT via GitHub Contents API
+   PAT → localStorage key: "gh_pat"
 ═══════════════════════════════════════════════ */
 
-const RESOURCES_DATA = [
-  { icon: '📚', name: 'Kaggle Learn', desc: 'Ücretsiz veri analizi, makine öğrenmesi ve derin öğrenme kursları. Her ders notebook ile uygulamalı.', tag: 'Kurs · Ücretsiz' },
-  { icon: '🎓', name: 'Coursera – IBM Data Science', desc: 'IBM\'in kapsamlı veri bilimi sertifika programı. Python, SQL ve ML konularını kapsar.', tag: 'Sertifika · Ücretli' },
-  { icon: '📖', name: 'Python for Data Analysis (Wes McKinney)', desc: 'Pandas\'ın yaratıcısından kapsamlı veri analizi kitabı. NumPy ve Pandas derinlemesine ele alınıyor.', tag: 'Kitap' },
-  { icon: '🤗', name: 'Hugging Face', desc: 'Makine öğrenmesi modelleri ve dataset\'leri için en büyük açık topluluk. Transformers merkezi.', tag: 'Platform' },
-  { icon: '📊', name: 'Towards Data Science (Medium)', desc: 'Veri bilimcilerin deneyim ve tutorial makaleleri paylaştığı Medium yayını.', tag: 'Blog' },
-  { icon: '🛠️', name: 'Scikit-learn Docs', desc: 'Her ML algoritması için örnekli, kapsamlı ve kullanıcı dostu dokümantasyon.', tag: 'Dokümantasyon' },
-  { icon: '🗂️', name: 'UCI ML Repository', desc: 'Makine öğrenmesi araştırmalarında kullanılan klasik veri setlerinin arşivi.', tag: 'Dataset' },
-];
+const GH_OWNER = '0x3m1r';
+const GH_REPO  = '0x3m1r.github.io';
+const GH_FILE  = 'notes.json';
+const GH_API   = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 
-function buildResources() {
-  const list = document.getElementById('resources-list');
-  list.innerHTML = RESOURCES_DATA.map(r => `
-    <div class="resource-item">
-      <span class="resource-icon">${r.icon}</span>
-      <div class="resource-info">
-        <h3>${r.name}</h3>
-        <p>${r.desc}</p>
-        <span class="resource-tag">${r.tag}</span>
-      </div>
-    </div>
-  `).join('');
+let ghPAT      = localStorage.getItem('gh_pat') || '';
+let notesCache = [];   // in-memory note array
+let notesSHA   = '';   // file SHA (required for PUT)
+let editingId  = null; // id of note being edited
+
+/* ── helpers ──────────────────────────────── */
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleString('tr-TR', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+function hint(msg, type = '') {
+  const el = document.getElementById('form-hint');
+  el.textContent = msg;
+  el.className = 'form-hint' + (type ? ' ' + type : '');
+}
+
+function setTokenStatus(ok, msg) {
+  const el = document.getElementById('token-status');
+  el.textContent = msg;
+  el.className = 'token-status ' + (ok ? 'ok' : (ok === false ? 'err' : ''));
+}
+
+/* ── GitHub API ───────────────────────────── */
+
+async function ghGet() {
+  const r = await fetch(GH_API, {
+    headers: { Authorization: `Bearer ${ghPAT}`, Accept: 'application/vnd.github+json' },
+  });
+  if (r.status === 404) { notesSHA = ''; return []; }
+  if (!r.ok) throw new Error(`GitHub GET ${r.status}`);
+  const data = await r.json();
+  notesSHA = data.sha;
+  return JSON.parse(atob(data.content.replace(/\n/g, '')));
+}
+
+async function ghPut(notes) {
+  const body = { message: 'notlar güncellendi', content: btoa(unescape(encodeURIComponent(JSON.stringify(notes, null, 2)))) };
+  if (notesSHA) body.sha = notesSHA;
+  const r = await fetch(GH_API, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${ghPAT}`,
+      Accept: 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(`GitHub PUT ${r.status}`);
+  const data = await r.json();
+  notesSHA = data.content.sha;
+}
+
+/* ── load & render ────────────────────────── */
+
+async function loadNotes() {
+  if (!ghPAT) { setTokenStatus(null, '⚪ Token girilmedi'); return; }
+  setTokenStatus(null, '⏳ Yükleniyor…');
+  try {
+    notesCache = await ghGet();
+    setTokenStatus(true, '🟢 GitHub bağlı');
+    renderNotes(notesCache);
+  } catch (e) {
+    setTokenStatus(false, '🔴 Bağlantı hatası');
+  }
+}
+
+function renderNotes(notes) {
+  const list  = document.getElementById('notes-list');
+  const empty = document.getElementById('notes-empty');
+  const count = document.getElementById('notes-count');
+
+  count.textContent = notes.length ? `${notes.length} not` : '';
+
+  const cards = notes.slice().reverse().map(n => {
+    const tags = (n.tags || []).map(t => `<span class="note-tag">${t}</span>`).join('');
+    return `
+      <div class="note-card" data-id="${n.id}">
+        <div class="note-card-header">
+          <div class="note-card-title">${esc(n.title)}</div>
+          <div class="note-card-actions">
+            <button class="note-icon-btn edit" onclick="startEdit('${n.id}')" title="Düzenle">✏️</button>
+            <button class="note-icon-btn del"  onclick="deleteNote('${n.id}')" title="Sil">🗑️</button>
+          </div>
+        </div>
+        ${tags ? `<div class="note-card-tags">${tags}</div>` : ''}
+        <div class="note-card-body">${esc(n.body)}</div>
+        <div class="note-card-date">${fmtDate(n.updated || n.created)}</div>
+      </div>`;
+  }).join('');
+
+  list.innerHTML = cards;
+  empty.style.display = notes.length ? 'none' : 'block';
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── search ───────────────────────────────── */
+
+document.getElementById('notes-search').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  if (!q) { renderNotes(notesCache); return; }
+  renderNotes(notesCache.filter(n =>
+    (n.title + n.body + (n.tags||[]).join(' ')).toLowerCase().includes(q)
+  ));
+});
+
+/* ── save / edit / delete ─────────────────── */
+
+document.getElementById('btn-save').addEventListener('click', saveNote);
+
+async function saveNote() {
+  const title = document.getElementById('note-title').value.trim();
+  const body  = document.getElementById('note-body').value.trim();
+  const rawTags = document.getElementById('note-tags').value;
+  if (!title) { hint('Başlık boş olamaz.', 'err'); return; }
+  if (!body)  { hint('Not içeriği boş olamaz.', 'err'); return; }
+  if (!ghPAT) { hint('Önce GitHub token gir.', 'err'); return; }
+
+  const tags = rawTags.match(/#[\wÀ-ɏ]+/g)?.map(t => t.slice(1)) || [];
+  const now  = new Date().toISOString();
+
+  document.getElementById('btn-save').disabled = true;
+  hint('Kaydediliyor…');
+
+  try {
+    if (editingId) {
+      notesCache = notesCache.map(n =>
+        n.id === editingId ? { ...n, title, body, tags, updated: now } : n
+      );
+    } else {
+      notesCache.push({ id: uid(), title, body, tags, created: now, updated: now });
+    }
+    await ghPut(notesCache);
+    hint('✓ Kaydedildi', 'ok');
+    clearForm();
+    renderNotes(notesCache);
+  } catch (e) {
+    hint('Hata: ' + e.message, 'err');
+  } finally {
+    document.getElementById('btn-save').disabled = false;
+  }
+}
+
+function startEdit(id) {
+  const n = notesCache.find(x => x.id === id);
+  if (!n) return;
+  editingId = id;
+  document.getElementById('note-title').value = n.title;
+  document.getElementById('note-body').value  = n.body;
+  document.getElementById('note-tags').value  = (n.tags||[]).map(t => '#'+t).join(' ');
+  document.getElementById('form-title').textContent  = '✏️ Notu Düzenle';
+  document.getElementById('btn-cancel').style.display = '';
+  document.getElementById('note-title').focus();
+  hint('');
+}
+
+document.getElementById('btn-cancel').addEventListener('click', clearForm);
+
+function clearForm() {
+  editingId = null;
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-body').value  = '';
+  document.getElementById('note-tags').value  = '';
+  document.getElementById('form-title').textContent  = '+ Yeni Not';
+  document.getElementById('btn-cancel').style.display = 'none';
+  hint('');
+}
+
+async function deleteNote(id) {
+  if (!confirm('Bu notu silmek istediğine emin misin?')) return;
+  notesCache = notesCache.filter(n => n.id !== id);
+  hint('Siliniyor…');
+  try {
+    await ghPut(notesCache);
+    hint('✓ Silindi', 'ok');
+    renderNotes(notesCache);
+  } catch (e) {
+    hint('Hata: ' + e.message, 'err');
+  }
+}
+
+/* ── token modal ──────────────────────────── */
+
+document.getElementById('token-btn').addEventListener('click', () => {
+  document.getElementById('modal-token').value = ghPAT;
+  document.getElementById('modal-overlay').style.display = 'flex';
+});
+
+document.getElementById('modal-cancel').addEventListener('click', () => {
+  document.getElementById('modal-overlay').style.display = 'none';
+});
+
+document.getElementById('modal-save').addEventListener('click', async () => {
+  const t = document.getElementById('modal-token').value.trim();
+  if (!t) return;
+  ghPAT = t;
+  localStorage.setItem('gh_pat', t);
+  document.getElementById('modal-overlay').style.display = 'none';
+  await loadNotes();
+});
+
+/* ── load when tab is first opened ───────── */
+
+document.querySelector('[data-tab="resources"]').addEventListener('click', () => {
+  if (!notesCache.length && ghPAT) loadNotes();
+});
+
+function initNotes() {
+  if (ghPAT) loadNotes();
+  else setTokenStatus(null, '⚪ Token girilmedi — Token Ayarla\'ya tıkla');
 }
 
 /* ═══════════════════════════════════════════════
@@ -667,4 +872,4 @@ function buildResources() {
 buildDiagramSVG('diagram-svg', NODES, EDGES, selectNode, 140, 58);
 buildDiagramSVG('ai-svg', AI_NODES, AI_EDGES, selectAINode, 155, 54);
 buildStats();
-buildResources();
+initNotes();
